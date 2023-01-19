@@ -16,10 +16,38 @@ import androidx.core.app.NotificationCompat;
 import com.example.claiddemo.MainActivity;
 import com.example.claiddemo.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import JavaCLAID.CLAID;
+
 public class CLAIDForegroundService extends Service
 {
+    static {
+        System.loadLibrary("JavaCLAID");
+    }
     private static final String CLASS_TAG = CLAIDForegroundService.class.getName();
+    private boolean isRunning = false;
     public static final String CHANNEL_ID = "CLAIDForegroundServiceChannel";
+
+    private String loadFileFromAssets(String fileName)
+    {
+
+        int size = 0;
+        try {
+            InputStream stream = getAssets().open(fileName);
+            size = stream.available();
+            byte[] buffer = new byte[size];
+            stream.read(buffer);
+            stream.close();
+            String result = new String(buffer);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     @Override
     public void onCreate()
@@ -30,42 +58,57 @@ public class CLAIDForegroundService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Foreground Service")
-                .setContentText(input)
+                .setContentText("CLAID Foreground Service")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
 
-        onServiceStarted();
+        if(!this.isRunning)
+        {
+            this.isRunning = true;
+            onServiceStarted();
+        }
 
-        //do heavy work on a background thread
-        //stopSelf();
-        return START_NOT_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     void onServiceStarted()
     {
+
         Log.i(CLASS_TAG, "CLAID foreground service started");
+        //  CLAID.connectTo(ip_port[0], Integer.parseInt(ip_port[1]));
+        String assetsXMLConfig = loadFileFromAssets("SamplingCoverage.xml");
+
+        CLAID.enableLoggingToFile("/sdcard/CLAIDAndroidLog.txt");
+        CLAID.loadFromXMLString(assetsXMLConfig);
+        CLAID.setContext(this.getBaseContext());
+        CLAID.startInSeparateThread();
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         super.onDestroy();
     }
+
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         return null;
     }
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+    private void createNotificationChannel()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Foreground Service Channel",
