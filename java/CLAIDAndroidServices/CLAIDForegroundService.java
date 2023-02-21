@@ -61,7 +61,7 @@ public class CLAIDForegroundService extends Service
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
+                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Foreground Service")
                 .setContentText("CLAID Foreground Service")
@@ -84,7 +84,7 @@ public class CLAIDForegroundService extends Service
 
         Log.i(CLASS_TAG, "CLAID foreground service started");
         //  CLAID.connectTo(ip_port[0], Integer.parseInt(ip_port[1]));
-        String assetsXMLConfig = loadFileFromAssets("SamplingCoverage.xml");
+        String assetsXMLConfig = loadFileFromAssets("DigitalAge.xml");
 
         CLAID.enableLoggingToFile("/sdcard/CLAIDAndroidLog.txt");
         CLAID.loadFromXMLString(assetsXMLConfig);
