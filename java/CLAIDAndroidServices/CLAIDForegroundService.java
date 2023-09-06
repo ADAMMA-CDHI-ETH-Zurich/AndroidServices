@@ -13,8 +13,9 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.example.claiddemo.MainActivity;
-import com.example.claiddemo.R;
+
+
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,14 +60,13 @@ public class CLAIDForegroundService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, CLAIDForegroundService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Foreground Service")
                 .setContentText("CLAID Foreground Service")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentIntent(pendingIntent)
+                .setOngoing(true)
                 .build();
         startForeground(1, notification);
 
@@ -76,17 +76,13 @@ public class CLAIDForegroundService extends Service
             onServiceStarted();
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     void onServiceStarted()
     {
-
         Log.i(CLASS_TAG, "CLAID foreground service started");
-        //  CLAID.connectTo(ip_port[0], Integer.parseInt(ip_port[1]));
-        String assetsXMLConfig = loadFileFromAssets("DigitalAge.xml");
-
-        CLAID.enableLoggingToFile("/sdcard/CLAIDAndroidLog.txt");
+        String assetsXMLConfig = loadFileFromAssets("CLAID.xml");
         CLAID.loadFromXMLString(assetsXMLConfig);
         CLAID.setContext(this.getBaseContext());
         CLAID.startInSeparateThread();
