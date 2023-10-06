@@ -106,7 +106,7 @@ public class CLAIDForegroundService extends Service
         CLAID.loadFromXMLString(assetsXMLConfig);
         CLAID.setContext(this.getBaseContext());
         CLAID.startInSeparateThread();
-        CLAID.enableLoggingToFile("/sdcard/CLAIDLog.txt");
+        //CLAID.enableLoggingToFile("/storage/emulated/0/Android/media/adamma.c4dhi.claid.wearos/" + "/CLAIDLog.txt");
     }
 
     @Override
