@@ -26,6 +26,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -87,6 +88,7 @@ public class CLAIDForegroundService extends Service
                 .setContentTitle("Foreground Service")
                 .setContentText("CLAID Foreground Service")
                 .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         startForeground(1, notification);
 
